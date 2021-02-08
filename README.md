@@ -4,7 +4,7 @@
 This app generates a HTML and CSV list of all alerts generated in your Nutanix cluster. The data has been gathered using the Nutanix v2 API alerts endpoint. It is cleaned and structured using pandas.
 
 
-## Requirements
+## Environment
 
 We recommend you to create a separate virtual environment running Python 3 for this app, and install all of the required dependencies there. 
 
@@ -24,6 +24,8 @@ In Windows:
 
 ```venv\Scripts\activate```
 
+## Requirements
+
 To install all of the required packages to this environment, simply run:
 
 ```pip install -r requirements.txt```
@@ -35,9 +37,9 @@ and all of the required pip packages, will be installed, and the app will be abl
 
 You have to specify the Nutanix cluster that you wish to connect to before running the app.
 
-To do so, open the `alerts-list-ntnx/request.py` file using a common text editor like Sublimetext or vim. An example is shown in the file as well. You will have to just replace the IP address of the cluster and the credentials you would use to login as well. Save and quit from the file.
+To do so, open the `alerts-list-ntnx/request.py` file using a common text editor like Sublimetext or vim. An example is shown in the file as well. You will have to just replace the IP address of the cluster and the credentials you would use to login as well. Save the file and quit from the editor.
 
-After this you could run this app 
+You are now all set to run this app 
 
 Run the app
 
