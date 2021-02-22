@@ -42,7 +42,7 @@ for page in range(1, total_pages + 1):
 
 
 # Generate a pandas dataframe with all the alerts
-df = pd.DataFrame(columns=['Created-Time','Id','Title','Alert Type','Resolved','Cluster uuid','Message','Severity', ])
+df = pd.DataFrame(columns=['Created-Time','Id','Title','Alert Type','Resolved','Cluster','Message','Severity', ])
 
 index = 0
 for response in range(total_pages):
@@ -63,6 +63,35 @@ for response in range(total_pages):
 df['Created-Time'] = pd.to_datetime(df['Created-Time'], origin='unix', unit='us')
 # df['Created-Time'] = df['Created-Time'].dt.date
 
+
+# Get Cluster Nme
+URL_Cluster = "https://{}:9440/api/nutanix/v1/clusters".format(ip)
+header = {"content-type": "application/json"}
+cluster_response_list = []
+cluster_res = requests.get(url=URL_Cluster, auth=auth, headers=header, params={'count':1}, verify=False)
+cluster_total_entities = cluster_res.json().get('metadata').get('grandTotalEntities')
+cluster_total_pages = math.ceil(cluster_total_entities/1000)
+
+for cluster_page in range(1, cluster_total_pages + 1):
+    cluster_response = requests.get(url=URL_Cluster, auth=auth, headers=header, params={'count':1000, 'page':cluster_page}, verify=False)
+    cluster_response_list.append(cluster_response)
+
+# Generate a pandas dataframe with uuid and name of all the clusters
+df1 = pd.DataFrame(columns=['Cluster uuid','Cluster Name', ])
+
+cluster_index = 0
+for cluster_response in range(cluster_total_pages):
+    for item in cluster_response_list[cluster_response].json().get('entities'):
+            cluster_list = []
+            cluster_list.append(item.get('uuid'))
+            cluster_list.append(item.get('name'))
+            df1.loc[cluster_index] = cluster_list
+            cluster_index += 1
+
+m = df1.set_index('Cluster uuid')['Cluster Name'].to_dict()
+v = df.filter(like='Cluster')
+df[v.columns] = v.replace(m)
+
 df.sort_values(by=['Created-Time'], inplace=True)
 
 #render dataframe as html
@@ -75,3 +104,15 @@ text_file.close()
 
 #render dataframe as csv
 df.to_csv('alerts_data.csv', index=False)
+'''
+#render cluster dataframe as html
+cluster_html =df1.to_html()
+
+#write html to file
+text_file = open("alerts_data_cluster_list.html", "w")
+text_file.write(cluster_html)
+text_file.close()
+
+#render dataframe as csv
+df1.to_csv('alerts_data_cluster_list.csv', index=False)
+'''
